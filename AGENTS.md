@@ -64,7 +64,7 @@ Google Calendar API v3 browser key in Google Cloud project "Navigart" (key "Navi
 
 ## Pitfalls
 - WordPress mangles `&` (see rule 7); the old inline snippet works around it by shipping its script as an escaped string run via `new Function`.
-- Fixture dates are absolute (autumn 2026 onward); refresh them when old.
+- Fixture dates are absolute (autumn 2026 to the end of 2028); refresh them when old. The dev server caches the fixtures module: restart it after editing `dev/fixtures`.
 - A key that works on the live site may still return 403 elsewhere: the referrer must match one of the allowed ones (port-less, e.g. `localhost/*`, `127.0.0.1/*`).
 - Playwright: lazily loaded months need ~1.5 s before inspecting; a mid-page `setViewportSize` can hang `page.screenshot` (go to `about:blank`, resize, then `goto`); `emulateMedia print` persists until reset to `screen`.
 - Ask the maintainer before changing a decided behaviour (see SPEC section 6), e.g. bar clipping, filters, popover layout.

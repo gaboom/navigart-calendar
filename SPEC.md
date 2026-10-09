@@ -152,7 +152,7 @@ What a check must cover
 
 Known limits of the approach
 - Browser timers are throttled in hidden/background tabs, which makes timing-based checks (loading indicator, retries) look broken. Test in a visible foreground window.
-- The fixtures have absolute dates (autumn 2026 onward) and must be refreshed when they become old.
+- The fixtures have absolute dates (autumn 2026 to the end of 2028; Feb 2027, Feb 2028 and Aug 2028 are deliberately empty) and must be refreshed when they become old.
 
 Possible future automation (only if the project grows): a headless-browser script that runs this checklist against `?test`. Nothing in the design prevents it, because test mode and stable class names already exist.
 

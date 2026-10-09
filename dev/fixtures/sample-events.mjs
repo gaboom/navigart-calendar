@@ -1,7 +1,7 @@
 // Synthetic events for reviewing the look locally. NOT real club data and never part of the production snippet.
 // They are served by test mode (dev/ server and docs/oceansailing-calendar-test.js) in place of the Google API, next to fixtures/real-events.json, and cover the cases the UI must handle:
 // every level (1-5), SRC, Egyéb, past events, events outside the first data window (x10 and x11, loaded on demand in month view),
-// events crossing a year boundary, an event ending exactly at midnight, a day with two events (28 Nov, x6 and x14), links in descriptions (good, unsafe, long) and plain text.
+// events crossing a year boundary, an event ending exactly at midnight, a day with two events (28 Nov 2026, x6 and x14) and one with three (10 Apr 2027, x20-x22), a trip across the spring DST change (x19), links in descriptions (good, unsafe, long) and plain text.
 // The shape is the Google Calendar API v3 events.list item shape (only the fields the snippet requests).
 export const sampleEvents = [
   { id: 'x1', status: 'confirmed', summary: 'Adria átkelés (2. szint) / 2 hajós', location: 'Pula, Horvátország',
@@ -44,4 +44,48 @@ export const sampleEvents = [
   { id: 'x14', status: 'confirmed', summary: 'Csomózó gyakorlat (1. szint)', location: 'Balatonfüred',
     description: '',
     start: { dateTime: '2026-11-28T10:00:00+01:00' }, end: { dateTime: '2026-11-28T12:00:00+01:00' } },
+  // More events spread over 2026-2028, to try paging, loading on demand and every category in many months.
+  // Deliberately empty months: Feb 2027, Feb 2028, Aug 2028 (and May and Aug 2026).
+  { id: 'x15', status: 'confirmed', summary: 'Vitorlás alapok (1. szint)', location: 'Balatonfüred',
+    description: '', start: { dateTime: '2026-10-17T09:00:00+02:00' }, end: { dateTime: '2026-10-17T16:00:00+02:00' } },
+  { id: 'x16', status: 'confirmed', summary: 'Őszi regatta (3. szint)', location: 'Siófok',
+    description: '', start: { dateTime: '2026-10-30T16:00:00+01:00' }, end: { dateTime: '2026-11-01T14:00:00+01:00' } },
+  { id: 'x17', status: 'confirmed', summary: 'Elsősegély tanfolyam (Egyéb)', location: 'Budapest, Klubhelyiség',
+    description: '', start: { dateTime: '2027-01-14T18:00:00+01:00' }, end: { dateTime: '2027-01-14T21:00:00+01:00' } },
+  { id: 'x18', status: 'confirmed', summary: 'Téli elmélet (2. szint)', location: 'Budapest, Klubhelyiség',
+    description: '', start: { dateTime: '2027-01-23T10:00:00+01:00' }, end: { dateTime: '2027-01-24T16:00:00+01:00' } },
+  { id: 'x19', status: 'confirmed', summary: 'Időátállás éjszakai túra (3. szint)', location: 'Balatonfüred',
+    description: '', start: { dateTime: '2027-03-27T18:00:00+01:00' }, end: { dateTime: '2027-03-28T10:00:00+02:00' } },
+  { id: 'x20', status: 'confirmed', summary: 'Szezonnyitó (1. szint)', location: 'Balatonfüred',
+    description: '', start: { dateTime: '2027-04-10T10:00:00+02:00' }, end: { dateTime: '2027-04-10T17:00:00+02:00' } },
+  { id: 'x21', status: 'confirmed', summary: 'SRC vizsga (SRC)', location: 'Budapest',
+    description: '', start: { dateTime: '2027-04-10T09:00:00+02:00' }, end: { dateTime: '2027-04-10T12:00:00+02:00' } },
+  { id: 'x22', status: 'confirmed', summary: 'Csomózás és kötélkezelés (1. szint)', location: 'Budapest, Klubhelyiség',
+    description: '', start: { dateTime: '2027-04-10T18:00:00+02:00' }, end: { dateTime: '2027-04-10T20:00:00+02:00' } },
+  { id: 'x23', status: 'confirmed', summary: 'Kvarner körút (2. szint)', location: 'Rijeka, Horvátország',
+    description: '', start: { dateTime: '2027-07-03T16:00:00+02:00' }, end: { dateTime: '2027-07-10T09:00:00+02:00' } },
+  { id: 'x24', status: 'confirmed', summary: 'Gyermek vitorlástábor (Egyéb)', location: 'Balatonfüred',
+    description: '', start: { date: '2027-07-19' }, end: { date: '2027-07-24' } },
+  { id: 'x25', status: 'confirmed', summary: 'Kornaták (4. szint)', location: 'Šibenik, Horvátország',
+    description: '', start: { dateTime: '2027-09-11T16:00:00+02:00' }, end: { dateTime: '2027-09-18T09:00:00+02:00' } },
+  { id: 'x26', status: 'confirmed', summary: 'SRC felkészítő (SRC)', location: 'Budapest',
+    description: '', start: { date: '2027-10-23' }, end: { date: '2027-10-25' } },
+  { id: 'x27', status: 'confirmed', summary: 'Időátállás utáni előadás (Egyéb)', location: 'Budapest, Klubhelyiség',
+    description: '', start: { dateTime: '2027-11-10T18:00:00+01:00' }, end: { dateTime: '2027-11-10T20:00:00+01:00' } },
+  { id: 'x28', status: 'confirmed', summary: 'Újévi vitorlázás (5. szint)', location: 'Kanári-szigetek',
+    description: '', start: { date: '2027-12-26' }, end: { date: '2028-01-09' } },
+  { id: 'x29', status: 'confirmed', summary: 'Tavaszi alapozó (1. szint)', location: 'Balatonfüred',
+    description: '', start: { dateTime: '2028-03-18T09:00:00+01:00' }, end: { dateTime: '2028-03-19T16:00:00+01:00' } },
+  { id: 'x30', status: 'confirmed', summary: 'Húsvéti túra (2. szint)', location: 'Pula, Horvátország',
+    description: '', start: { dateTime: '2028-04-15T16:00:00+02:00' }, end: { dateTime: '2028-04-22T09:00:00+02:00' } },
+  { id: 'x31', status: 'confirmed', summary: 'Májusi regatta (3. szint)', location: 'Siófok',
+    description: '', start: { dateTime: '2028-05-20T09:00:00+02:00' }, end: { dateTime: '2028-05-21T17:00:00+02:00' } },
+  { id: 'x32', status: 'confirmed', summary: 'Nyári nagytúra (4. szint)', location: 'Split, Horvátország',
+    description: '', start: { dateTime: '2028-06-24T16:00:00+02:00' }, end: { dateTime: '2028-07-08T09:00:00+02:00' } },
+  { id: 'x33', status: 'confirmed', summary: 'SRC rádiós tanfolyam (SRC)', location: 'Budapest',
+    description: '', start: { date: '2028-09-09' }, end: { date: '2028-09-12' } },
+  { id: 'x34', status: 'confirmed', summary: 'Szezonzáró (Egyéb)', location: 'Balatonfüred',
+    description: '', start: { dateTime: '2028-10-28T12:00:00+02:00' }, end: { dateTime: '2028-10-28T22:00:00+02:00' } },
+  { id: 'x35', status: 'confirmed', summary: 'Óceáni átkelés (5. szint)', location: 'Kanári-szigetek',
+    description: '', start: { date: '2028-11-12' }, end: { date: '2028-12-03' } },
 ];
