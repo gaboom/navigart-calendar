@@ -56,7 +56,7 @@ Google Calendar API v3 browser key in Google Cloud project "Navigart" (key "Navi
 
 ## Verify a change
 1. `npm run build` succeeds; `docs/` has no plain key (search for the key prefix `AIza`); a second build gives no diff.
-2. `npm run dev`, then run the checklist from `SPEC.md` section 7 against `/?test`, `/?test&delay=3000`, `/?test&fail` and `/test.html?test`. Minimum for any UI change: list view, month view (page back and forward), filters per view, popover (including a real Esc press), month grid keyboard (arrows, PageUp/PageDown, Enter), 390 px viewport, iframe auto-height, no console errors.
+2. `npm run dev`, then run the checklist from `SPEC.md` section 7 against `/?test`, `/?test&delay=3000`, `/?test&fail` and `/test.html?test`. Minimum for any UI change: list view, month view (page back and forward), filters per view, popover (including a real Esc press), month grid keyboard (arrows, PageUp/PageDown, Enter), 390 px viewport, iframe auto-height, no console errors. Header row (chips left, subscribe and Lista/Hónap right) stays one row at 900 px even with the theme's uppercase, letter-spaced buttons (`test.html` imitates it). Framed document must not scroll: `documentElement.scrollHeight <= clientHeight` inside the iframe (the margin of the last card once leaked past the component and caused a scrollbar).
 3. Smoke test the real API at `http://localhost:8765/` (no `?test`).
 4. Test in a **visible foreground** browser window: hidden tabs throttle timers and make loading/retry checks look broken. With Playwright, prefer `page.evaluate` clicks for iframe content and generous waits.
 5. Update `README.md` (what), `SPEC.md` (why/decisions/tests) and this file (how) when they are affected.

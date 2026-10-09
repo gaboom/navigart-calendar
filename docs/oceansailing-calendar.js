@@ -939,11 +939,12 @@
   }
 
   // The build puts the contents of oceansailing-calendar.css here.
-  var CSS = `oceansailing-calendar{display:block}
+  var CSS = `oceansailing-calendar{display:flow-root}
 .osse-cal{--line:rgba(0,0,0,.14);--r:4px;--ink:#101010;--blue:#1e73be;--blue-dark:#155a96;--head:Onest,Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--text:#444;position:relative;max-width:900px;margin-bottom:3.5rem;font:400 16px/1.6 var(--body);color:var(--text)}
 .osse-cal *{box-sizing:border-box;font-family:var(--body)}
+.osse-cal button,.osse-cal summary{text-transform:none;letter-spacing:normal}
 .osse-cal__tools{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:.75rem 1rem;margin:0 0 1.25rem}
-.osse-cal__filters{display:flex;flex-wrap:wrap;gap:.5rem;flex:1 1 auto}
+.osse-cal__filters{display:flex;flex-wrap:wrap;gap:.5rem;flex:1 1 18rem}
 .osse-cal__views{display:flex;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden}
 .osse-cal__right{position:relative;display:flex;align-items:flex-start;gap:.5rem;margin-left:auto}
 .osse-cal__sub{position:static}
