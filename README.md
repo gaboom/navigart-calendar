@@ -43,6 +43,7 @@ Three ways, same code. Pick one:
 ```
 
 - The script can go anywhere in the page, before or after the element. Several elements on one page work.
+- **Placeholder div instead of the custom tag:** `<div data-oceansailing-calendar></div>` gives the same result; the script puts the component inside the div. Use it where an editor would drop the unknown tag (the WordPress classic editor's Visual tab does). The div itself is not styled, so use the CSS override below on `oceansailing-calendar.osse-cal` inside it.
 - The calendar is as wide as its container, up to 900 px, and left-aligned.
 - **Fonts and text colour are fixed** so the calendar looks the same on every page: the component loads Inter and Onest from Google Fonts itself and sets its own font (16 px Inter) and text colour (`#444`). It does not inherit the host page's typography. Change them with the variables below.
 - **The page's domain must be an allowed referrer of the Google API key.** Currently allowed: `oceansailing.meder.hu`, `navigart.net`, `*.navigart.net`, `gaboom.github.io`, `localhost`, `127.0.0.1`. Any other domain gets "A naptár most nem érhető el." (HTTP 403 in the browser console) until it is added in the Google Cloud console (APIs & Services > Credentials > the key > Websites). The iframe below does not have this limit.

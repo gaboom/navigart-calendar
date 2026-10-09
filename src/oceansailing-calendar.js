@@ -964,4 +964,13 @@
     }
   }
   if (!customElements.get('oceansailing-calendar')) { customElements.define('oceansailing-calendar', OceansailingCalendar); }
+
+  // <div data-oceansailing-calendar></div> works like the custom tag. WordPress's visual editor drops unknown tags but keeps divs with data attributes.
+  function mountPlaceholders() {
+    var holders = document.querySelectorAll('div[data-oceansailing-calendar]');
+    for (var i = 0; i < holders.length; i++) {
+      if (!holders[i].querySelector('oceansailing-calendar')) { holders[i].appendChild(document.createElement('oceansailing-calendar')); }
+    }
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', mountPlaceholders); } else { mountPlaceholders(); }
 })();

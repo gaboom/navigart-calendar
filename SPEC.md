@@ -78,6 +78,7 @@ Look
 
 Test mode
 - F21. Test mode: `?test` on the calendar page URL (iframe, standalone) or on the component's script URL (`oceansailing-calendar.js?test`) serves events from `test-events.json` (next to the script) instead of calling Google (see section 7). The component file contains the small mock, but no test data; there is no separate test script. Ships in production on purpose.
+- F22. Placeholder mount: `<div data-oceansailing-calendar></div>` gets a `<oceansailing-calendar>` appended by the script (on DOMContentLoaded or immediately). Reason: the WordPress classic editor's Visual tab strips unknown tags but keeps divs with data attributes.
 
 ## 5. Non-functional requirements
 
