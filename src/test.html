@@ -21,8 +21,11 @@
 
   <h1>1. Web component directly in the page</h1>
   <oceansailing-calendar></oceansailing-calendar>
-  <script>if (/[?&]test\b/.test(location.search)) { document.write('<script src="oceansailing-calendar-test.js"><\/script>'); }</script>
-  <script src="oceansailing-calendar.js"></script>
+  <script>
+    var s = document.createElement('script');
+    s.src = 'oceansailing-calendar.js' + location.search;
+    document.body.appendChild(s);
+  </script>
   <div class="footer">Footer (the component must not overlap it)</div>
 
   <h1>2. iframe with auto-height</h1>

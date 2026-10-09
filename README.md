@@ -84,7 +84,7 @@ Add a **Custom HTML** block (not the classic or visual editor, which mangles scr
 
 - Open the browser console (F12): no red errors; the calendar shows events.
 - `https://calendar.navigart.net/test.html?test` shows both embedding modes side by side with test data, to compare against.
-- To try the component on a real page with test data, add `<script src="https://calendar.navigart.net/oceansailing-calendar-test.js"></script>` **before** the component script (a red "TESZT ADATOK" badge shows).
+- To try the component on a real page with test data, add `?test` to the component script URL: `<script src="https://calendar.navigart.net/oceansailing-calendar.js?test"></script>`; for the iframe, add it to the iframe `src`: `https://calendar.navigart.net/?test`. A red "TESZT ADATOK" badge shows. Remove `?test` again when done.
 
 | Symptom | Cause |
 |---|---|
@@ -107,16 +107,17 @@ To link an event to a specific page, put the link in the event description.
 
 ## Test mode
 
-Add `?test` to any calendar URL to use built-in test events instead of Google (a red "TESZT ADATOK" badge is shown):
+Add `?test` to the calendar page URL (iframe or standalone) or to the **script URL** of the component to use test events instead of Google (a red "TESZT ADATOK" badge is shown). The component loads them from `test-events.json` next to the script; the script itself contains no test data. The host page's own URL has no effect on the component.
 
 | URL | Shows |
 |---|---|
 | `/?test` | calendar with test data |
 | `/?test&delay=3000` | slow responses (loading indicator) |
 | `/?test&fail` | failing responses (error and "Újra" retry) |
-| `/test.html?test` | component in a page and in an iframe with auto-height, side by side |
+| `/test.html?test` | component in a page and in an iframe with auto-height, side by side (the query is passed on to both) |
+| `<script src=".../oceansailing-calendar.js?test">` | the component with test data on any page |
 
-Works on the published site too, e.g. https://calendar.navigart.net/?test.
+Works on the published site too, e.g. https://calendar.navigart.net/?test. In WordPress use only `?test` (no `&` there: WordPress rewrites it); `delay` and `fail` are for the dev pages.
 
 ## Hosting notes
 

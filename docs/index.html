@@ -18,9 +18,12 @@
 </head>
 <body>
   <oceansailing-calendar></oceansailing-calendar>
-  <!-- ?test switches to built-in test data (see README.md). -->
-  <script>if (/[?&]test\b/.test(location.search)) { document.write('<script src="oceansailing-calendar-test.js"><\/script>'); }</script>
-  <script src="oceansailing-calendar.js"></script>
+  <!-- ?test (and ?test&delay=3000, ?test&fail) on this page is passed on to the component script, which then uses test-events.json instead of Google (see README.md). -->
+  <script>
+    var s = document.createElement('script');
+    s.src = 'oceansailing-calendar.js' + location.search;
+    document.body.appendChild(s);
+  </script>
   <script>
     // Standalone page or iframe content. When framed, tell the parent page how tall the calendar is so it can resize the iframe.
     // The parent needs the small listener described in README.md.

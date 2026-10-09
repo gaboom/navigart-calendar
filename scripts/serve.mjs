@@ -10,14 +10,14 @@ import http from 'node:http';
 import { build } from './build.mjs';
 
 const PORT = Number(process.env.PORT) || 8765;
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.txt': 'text/plain; charset=utf-8' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.txt': 'text/plain; charset=utf-8' };
 
 http.createServer((req, res) => {
   const name = new URL(req.url, 'http://x').pathname.replace(/^\/$/, '/index.html').slice(1);
   try {
     const { files } = build();
     if (Object.hasOwn(files, name)) {
-      res.writeHead(200, { 'Content-Type': TYPES[name.slice(name.lastIndexOf('.'))], 'Cache-Control': 'no-store' });
+      res.writeHead(200, { 'Content-Type': TYPES[name.slice(name.lastIndexOf('.'))], 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*' }); // CORS like GitHub Pages, so test-events.json loads when the script is embedded from another origin
       return res.end(files[name]);
     }
     res.writeHead(404, { 'Content-Type': 'text/plain' });

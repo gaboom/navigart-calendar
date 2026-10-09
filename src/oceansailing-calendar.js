@@ -51,6 +51,58 @@
   // The calendar's public iCal feed: subscribing keeps a visitor's own calendar app in sync.
   var FEED_WEBCAL = 'webcal://calendar.google.com/calendar/ical/oceansailingse%40gmail.com/public/basic.ics';
   var FEED_GOOGLE = 'https://calendar.google.com/calendar/render?cid=oceansailingse%40gmail.com';
+
+  // Test mode: switched on by a query on this script's own URL (".../oceansailing-calendar.js?test"), never by the host page's URL.
+  // The Google API is then replaced by the events in test-events.json next to this script, so nothing about the test data is in this file.
+  // Knobs (use & only where WordPress does not touch the markup): delay=3000 slow answers, fail failing answers. Also at run time: window.__delay, window.__fail, window.__fetchLog.
+  var SCRIPT_URL = document.currentScript && document.currentScript.src;
+  var TEST = SCRIPT_URL ? new URL(SCRIPT_URL).searchParams : null;
+  if (TEST && !TEST.has('test')) { TEST = null; }
+  var testEvents = null;
+  function loadTestEvents() {
+    if (!testEvents) {
+      testEvents = fetch(new URL('test-events.json', SCRIPT_URL)).then(function (r) {
+        if (!r.ok) { throw new Error('HTTP ' + r.status); }
+        return r.json();
+      }).catch(function (e) { testEvents = null; throw e; });
+    }
+    return testEvents;
+  }
+  function testFetch(url) {
+    window.__fetchLog.push(String(url));
+    var p = new URL(url).searchParams;
+    var from = new Date(p.get('timeMin'));
+    var to = new Date(p.get('timeMax'));
+    return loadTestEvents().then(function (all) {
+      var items = all.filter(function (i) {
+        var s = new Date(i.start.dateTime || i.start.date + 'T00:00:00Z');
+        var e = new Date(i.end.dateTime || i.end.date + 'T00:00:00Z');
+        return e > from && s < to;
+      });
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          if (window.__fail) { resolve({ ok: false, status: 500 }); return; }
+          resolve({ ok: true, json: function () { return Promise.resolve({ items: items }); } });
+        }, window.__delay);
+      });
+    });
+  }
+  function apiFetch(url, opts) { return TEST ? testFetch(url) : fetch(url, opts); }
+  if (TEST) {
+    window.__delay = Number(TEST.get('delay')) || 350;
+    window.__fail = TEST.has('fail');
+    window.__fetchLog = [];
+    // Make it obvious that the data is not real.
+    var showBadge = function () {
+      if (document.getElementById('osse-cal-test-badge')) { return; }
+      var b = document.createElement('div');
+      b.id = 'osse-cal-test-badge';
+      b.textContent = 'TESZT ADATOK';
+      b.style.cssText = 'position:fixed;right:8px;bottom:8px;z-index:99999;background:#c0392b;color:#fff;font:600 11px/1 sans-serif;padding:4px 8px;border-radius:4px;opacity:.85;pointer-events:none';
+      document.body.appendChild(b);
+    };
+    if (document.body) { showBadge(); } else { document.addEventListener('DOMContentLoaded', showBadge); }
+  }
   function mount(root) {
     var TIME = { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
     var events = [];
@@ -821,7 +873,7 @@
           fields: 'nextPageToken,items(id,status,summary,description,location,start,end,sequence,updated)'
         });
         if (token) { q.set('pageToken', token); }
-        var res = await fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events?' + q, { signal: ctrl.signal });
+        var res = await apiFetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(CALENDAR_ID) + '/events?' + q, { signal: ctrl.signal });
         if (!res.ok) { throw new Error('HTTP ' + res.status); }
         var data = await res.json();
         items = items.concat(data.items || []);

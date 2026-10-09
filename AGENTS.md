@@ -16,10 +16,9 @@ How to work on this repo (humans and AI agents). *What* it is: `README.md`. *Why
 ```
 src/oceansailing-calendar.js       the component: config at the top, annotated; mount(root) holds all per-instance state
 src/oceansailing-calendar.css      styles, scoped under .osse-cal (inlined into the JS by the build)
-src/index.html                     standalone / iframe page (height reporting, ?test switch; fonts are loaded by the component)
+src/index.html                     standalone / iframe page (height reporting; passes ?test on to the component script; fonts are loaded by the component)
 src/test.html                      embed test page: component directly + iframe with auto-height
-src/oceansailing-calendar-test.js  test mode: replaces fetch for the Google API with built-in events
-dev/fixtures/                      test events (real club events snapshot + synthetic edge cases), inlined into the test script
+dev/fixtures/                      test events (real club events snapshot + synthetic edge cases); the build writes them to docs/test-events.json, which the component fetches in test mode (?test on its script URL)
 scripts/build.mjs                  src -> docs/, key masking + self-check
 scripts/serve.mjs                  dev server (builds on every request)
 package.json                       "version" (SemVer) is the only place to set the release version; the build publishes it as docs/version.txt
@@ -29,7 +28,7 @@ docs/                              PUBLISHED output (GitHub Pages), generated bu
 
 ## Commands
 ```
-npm run build   # writes docs/ (calendar, index.html, test script, test.html); prints the decoded key only as AIza…abcd
+npm run build   # writes docs/ (calendar, index.html, test-events.json, test.html); prints the decoded key only as AIza…abcd
 npm run build:show-key   # same, prints the full plain key (local use only; never in CI or shared logs). Do not use `npm run build -- --show-key`: PowerShell swallows the `--`
 npm run mask -- <key>   # prints the masked form of a key, for API_KEY_MASKED
 npm run dev     # http://localhost:8765/  (rebuilds per request: edit src/, refresh the browser)
@@ -46,7 +45,7 @@ Stop the dev server when done unless the maintainer wants to keep testing (find 
 - Data: one shared `events` list, `months{}` tracks per-month load state (`loading` / `done` / `error`). Day arithmetic is in Europe/Budapest.
 - Categories, colours and fallback pages: `TYPES` (first match wins, `Egyéb` stays last). Window size: `MONTHS_BACK`, `MONTHS_AHEAD`. Calendar: `CALENDAR_ID` (must stay public). Look: CSS variables at the top of the CSS file.
 - Month grid keyboard (SPEC F25): `cur` (shown month), `gridFocus` (day to focus after a re-render), `popKey` (popover identity), roving `tabindex` via `rovingDay`/`setRoving`, keys in `onGridKey`. Bars are `aria-hidden` and not focusable by design; day cells carry the semantics. Bars on neighbouring-month days are intended (do not clip); a month is "empty" only if the whole visible grid has no bar.
-- Build placeholders in the source: `'/*CSS*/'` in the component, `/*EVENTS*/[]` in the test script. Do not remove them; the build fails loudly if they are missing.
+- Build placeholder in the source: `'/*CSS*/'` in the component. Do not remove it; the build fails loudly if it is missing. Test mode lives in the component (`TEST`, `testFetch`, `apiFetch`); keep test data out of it (it belongs in `dev/fixtures`).
 
 ## API key
 Google Calendar API v3 browser key in Google Cloud project "Navigart" (key "Navigart.net OceanSailing"). Restrictions: Calendar API only; HTTP referrers `*.navigart.net/*`, `navigart.net/*`, `oceansailing.meder.hu/*`, `localhost/*`, `127.0.0.1/*`, `gaboom.github.io/*` (GitHub Pages fallback address). SPEC.md section 7 has the same list; keep both in sync.

@@ -1,7 +1,7 @@
 // Builds the published site into docs/ (served by GitHub Pages at https://calendar.navigart.net/):
 //   docs/oceansailing-calendar.js   the web component, CSS inlined, API key masked. Readable on purpose (no minifying), so it can be debugged in the browser.
 //   docs/index.html                 copy of src/index.html: the calendar as a standalone page and as iframe content.
-//   docs/oceansailing-calendar-test.js  test mode (?test): built-in test events instead of the Google API. Shipped on purpose.
+//   docs/test-events.json           test events for test mode (script URL with ?test): real club events snapshot + synthetic edge cases. Shipped on purpose; the component file holds no test data.
 //   docs/test.html                  copy of src/test.html: embed test page (component directly + iframe with auto-height).
 //   docs/version.txt                the release version, generated from package.json "version"; lets anyone check what is deployed.
 //
@@ -43,7 +43,7 @@ export function build() {
   const version = JSON.parse(read('package.json')).version;
   if (!/^\d+\.\d+\.\d+$/.test(version)) { throw new Error('package.json "version" must look like 0.1.0'); }
 
-  const files = { 'oceansailing-calendar.js': js, 'index.html': read('src/index.html'), 'oceansailing-calendar-test.js': buildTestApi(), 'test.html': read('src/test.html'), 'version.txt': version + '\n' };
+  const files = { 'oceansailing-calendar.js': js, 'index.html': read('src/index.html'), 'test-events.json': buildTestEvents(), 'test.html': read('src/test.html'), 'version.txt': version + '\n' };
   for (const [name, content] of Object.entries(files)) {
     if (content.includes(decoded)) { throw new Error('Plain key found in output: ' + name); }
   }
@@ -51,14 +51,9 @@ export function build() {
   return { files, decoded };
 }
 
-function buildTestApi() {
+function buildTestEvents() {
   const real = JSON.parse(read('dev/fixtures/real-events.json')).items;
-  const events = JSON.stringify([...real, ...sampleEvents]).replace(/</g, '\\u003c');
-  const js = read('src/oceansailing-calendar-test.js');
-  if (!js.includes('/*EVENTS*/[]')) { throw new Error('Placeholder missing in src/oceansailing-calendar-test.js'); }
-  const out = js.replace('/*EVENTS*/[]', () => events);
-  new vm.Script(out, { filename: 'oceansailing-calendar-test.js' }); // syntax check
-  return out;
+  return JSON.stringify([...real, ...sampleEvents]) + '\n';
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

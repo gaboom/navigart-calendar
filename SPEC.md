@@ -77,7 +77,7 @@ Look
 - F24. Print (`@media print`, both views). Prints what is on screen (current view, month and filter). Hidden: filters, view switch, subscribe, paging buttons, add-to-calendar links, popover, day list. Black on white with no reliance on background graphics: category colour only as borders (card/bar stripe, outlined tag), today as a bold outlined number. Cards, month heading and week rows never split across pages; month bars wrap their title instead of truncating. Link URLs are not appended. Page margins are the host page's choice (`index.html` sets none).
 
 Test mode
-- F21. `?test` serves built-in test events instead of calling Google (see section 7). It ships in production on purpose.
+- F21. Test mode: `?test` on the calendar page URL (iframe, standalone) or on the component's script URL (`oceansailing-calendar.js?test`) serves events from `test-events.json` (next to the script) instead of calling Google (see section 7). The component file contains the small mock, but no test data; there is no separate test script. Ships in production on purpose.
 
 ## 5. Non-functional requirements
 
@@ -108,7 +108,7 @@ Test mode
 | D14 | One shared event list for both views, month view loads month by month | Separate data per view; load everything up front | Month view stays fast and light, and what was loaded is not thrown away: list view shows everything loaded so far. |
 | D15 | Filters are multi-select, all selected by default, and **per view** | One shared filter; single-select with "none selected" = all | Users think of the two views as separate tools. A single-select where nothing looks pressed was confusing; all-pressed shows the real state. No persistence: always a predictable start. |
 | D16 | Event description is rebuilt from a whitelist, never inserted as HTML | Sanitiser library; `innerHTML` | Descriptions come from a Google account anyone with edit rights controls. DOM nodes only means no XSS class of bugs, and no dependency is needed. |
-| D17 | Test mode (`?test`) is shipped in production | Dev-only mock | The same switch is used by the maintainer, by automated checks and by anyone verifying the published site, including when the key or Google is unavailable. Zero cost, clearly badged. |
+| D17 | Test mode (`?test`) is shipped in production, switched by the query of the component's own script URL (and of the iframe URL); the data is a separate JSON file | Dev-only mock; a separate `-test.js` distributable; switching by the host page's URL | The same switch is used by the maintainer, by automated checks and by anyone verifying the published site, including when the key or Google is unavailable. Only the script URL (not the host page URL) switches it, so a visitor's link cannot turn a club page into test data. One script to embed, no second file to remember, and the production script carries no test data. Zero cost, clearly badged. |
 | D18 | WordPress is never touched by the project tooling | Automated deployment to WP | Production site must not be at risk. The only integration is a paste of two small snippets by a person. The older inline version still running on WordPress lives in the `osse-wip` repo. |
 | D19 | The month is an ARIA date grid with one roving tab stop; event bars are decorative (mouse/touch only) | Every bar and every day a tab stop; light semantics without `role=grid` | Tabbing through ~30 cells and every bar is slow. The grid pattern gives one tab stop and arrow keys, and the day cell can name all its events. Bars cannot carry the semantics because a bar spans several days. |
 | D20 | Bars are drawn on neighbouring-month days of the grid; a month counts as empty only if the whole visible grid has no bar; the empty note is a neutral overlay on greyed cells | Clip bars to the month; show the note under the grid in a dashed box; reuse the error status | Spill-over bars are useful and were decided early. A note beside a visible bar would contradict itself. Empty is not a failure, so it must not look like the red error status. |
@@ -126,6 +126,7 @@ Test URLs (locally `http://localhost:8765/`, in production `https://calendar.nav
 - `/?test&fail` failing responses (error, "Újra").
 - In the browser console the same knobs work at run time: `window.__delay = 3000`, `window.__fail = true`, and `window.__fetchLog` lists the requested URLs (use it to check the data window and on-demand loads).
 - `/test.html?test` component used directly in a page **and** inside the iframe with auto-height; checks footer overlap.
+- Embedded from another origin (client-side only, e.g. injecting the element and `<script src=".../oceansailing-calendar.js?test">` into any page in the browser console): test data loads (CORS from GitHub Pages), badge shows; without `?test` the real API is used.
 - `/` without `?test` uses the real API (needs an allowed referrer, e.g. `localhost`).
 
 What a check must cover
