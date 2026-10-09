@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ocean Sailing SE naptár</title>
+  <!-- The component loads the club fonts (Inter, Onest) itself; preconnect just starts it earlier. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    html { background: #fff; }
+    body { margin: 0; padding: 16px; font: 400 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #444; }
+    /* The iframe's own height is controlled by the parent (see the height message below), so no bottom gap is needed. */
+    body.framed { padding: 0; }
+    body.framed oceansailing-calendar { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <oceansailing-calendar></oceansailing-calendar>
+  <!-- ?test switches to built-in test data (see README.md). -->
+  <script>if (/[?&]test\b/.test(location.search)) { document.write('<script src="oceansailing-calendar-test.js"><\/script>'); }</script>
+  <script src="oceansailing-calendar.js"></script>
+  <script>
+    // Standalone page or iframe content. When framed, tell the parent page how tall the calendar is so it can resize the iframe.
+    // The parent needs the small listener described in README.md.
+    if (window.self !== window.top) {
+      document.body.classList.add('framed');
+      var cal = document.querySelector('oceansailing-calendar');
+      var last = 0;
+      var report = function () {
+        var h = Math.ceil(cal.getBoundingClientRect().height);
+        if (h !== last) { last = h; window.parent.postMessage({ type: 'oceansailing-calendar:height', height: h }, '*'); }
+      };
+      new ResizeObserver(report).observe(cal);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+node_modules/
+# Local key for the build; never commit
+.env
+.env.*
+*.local
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.playwright-mcp/

@@ -1,0 +1,45 @@
+{
+ "items": [
+  {
+   "id": "68v489a37s39j4evp62obna2uc",
+   "status": "confirmed",
+   "summary": "Adriai tanfolyam (1. szint)",
+   "description": "Részletek: https://oceansailing.meder.hu/turak/tengeri-vitorlas-tanfolyam/",
+   "location": "Horvátország",
+   "start": {
+    "dateTime": "2026-10-17T16:00:00+02:00",
+    "timeZone": "Europe/Belgrade"
+   },
+   "end": {
+    "dateTime": "2026-10-24T09:00:00+02:00",
+    "timeZone": "Europe/Belgrade"
+   }
+  },
+  {
+   "id": "1424qnoqf3p6en5o5tqd38v0n3_20261109",
+   "status": "confirmed",
+   "summary": "SRC rádiós tanfolyam (013)",
+   "description": "\u003ca href=\"https://oceansailing.meder.hu/tanuloi-tajekoztato-src/\"\u003ehttps://oceansailing.meder.hu/tanuloi-tajekoztato-src/\u003c/a\u003e",
+   "location": "JEANNEAU Magyarország, Budapest, Szent Korona u. 84, 1161 Magyarország",
+   "start": {
+    "date": "2026-11-09"
+   },
+   "end": {
+    "date": "2026-11-10"
+   }
+  },
+  {
+   "id": "3niuf37841um0dluoe75dad8n3",
+   "status": "confirmed",
+   "summary": "SRC vizsga",
+   "description": "SRC házi vizsga (on-line) előtte 1-2 nappal!",
+   "location": "Szent Korona u. 85, Budapest, Szent Korona u. 85, 1161 Magyarország",
+   "start": {
+    "date": "2026-11-11"
+   },
+   "end": {
+    "date": "2026-11-12"
+   }
+  }
+ ]
+}

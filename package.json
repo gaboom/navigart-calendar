@@ -1,0 +1,15 @@
+{
+  "name": "navigart-calendar",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Ocean Sailing SE calendar: <oceansailing-calendar> web component, also usable as an iframe or standalone page. Published from docs/ via GitHub Pages.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:show-key": "node scripts/build.mjs --show-key",
+    "mask": "node scripts/mask.mjs",
+    "dev": "node scripts/serve.mjs"
+  }
+}

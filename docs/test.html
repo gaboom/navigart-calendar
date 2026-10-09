@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Ocean Sailing SE naptár: embed test</title>
+  <!-- Stands in for the club theme, which provides these fonts on the real site. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Onest:wght@600&display=swap">
+  <style>
+    body { margin: 0 auto; max-width: 960px; padding: 16px; font: 400 16px/1.6 Inter, sans-serif; color: #444; }
+    h1 { font-size: 20px; border-bottom: 1px solid #ccc; margin-top: 40px; }
+    .footer { background: #101010; color: #fff; padding: 24px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <p>Embed test page imitating a club page. Add <code>?test</code> to the URL to use test data (see README.md), e.g. <code>test.html?test&amp;delay=3000</code>.</p>
+
+  <h1>1. Web component directly in the page</h1>
+  <oceansailing-calendar></oceansailing-calendar>
+  <script>if (/[?&]test\b/.test(location.search)) { document.write('<script src="oceansailing-calendar-test.js"><\/script>'); }</script>
+  <script src="oceansailing-calendar.js"></script>
+  <div class="footer">Footer (the component must not overlap it)</div>
+
+  <h1>2. iframe with auto-height</h1>
+  <!-- This is the snippet to paste into WordPress (no "&" characters, because WordPress rewrites them). -->
+  <iframe id="oceansailing-calendar-frame" title="Naptár" style="border:0;width:100%;height:700px"></iframe>
+  <script>
+    // Test-only: the frame source is set here so that ?test and the other flags are passed on to the iframe.
+    document.getElementById('oceansailing-calendar-frame').src = 'index.html' + location.search;
+    window.addEventListener('message', function (e) {
+      var frame = document.getElementById('oceansailing-calendar-frame');
+      if (e.origin !== location.origin) { return; }
+      if (e.source !== frame.contentWindow) { return; }
+      var d = e.data;
+      if (d) {
+        if (d.type === 'oceansailing-calendar:height') {
+          if (typeof d.height === 'number') { frame.style.height = d.height + 'px'; }
+        }
+      }
+    });
+  </script>
+  <div class="footer">Footer</div>
+</body>
+</html>
