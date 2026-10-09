@@ -1,9 +1,26 @@
 oceansailing-calendar{display:flow-root}
-.osse-cal{--line:rgba(0,0,0,.14);--r:4px;--ink:#101010;--blue:#1e73be;--blue-dark:#155a96;--head:Onest,Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--text:#444;position:relative;max-width:900px;margin-bottom:3.5rem;font:400 16px/1.6 var(--body);color:var(--text)}
+.osse-cal{--line:rgba(0,0,0,.14);--r:4px;--ink:#101010;--blue:#1e73be;--blue-dark:#155a96;--head:Onest,Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--text:#444;position:relative;width:100%;max-width:900px;container-type:inline-size;margin-bottom:3.5rem;font:400 16px/1.6 var(--body);color:var(--text)}
 .osse-cal *{box-sizing:border-box;font-family:var(--body)}
 .osse-cal button,.osse-cal summary{text-transform:none;letter-spacing:normal}
 .osse-cal__tools{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:.75rem 1rem;margin:0 0 1.25rem}
 .osse-cal__filters{display:flex;flex-wrap:wrap;gap:.5rem;flex:1 1 18rem}
+/* The tools row stays on one line down to a 680 px wide calendar: the chips and view buttons shrink with the container. Narrower than that the row wraps. */
+@container (max-width:860px){
+  .osse-cal__filters{gap:.4rem}
+  .osse-cal .osse-cal__chip{padding:.4rem .7rem;font-size:.85rem}
+  .osse-cal .osse-cal__views .osse-cal__navbtn{padding:0 .55rem;font-size:.85rem}
+}
+@container (max-width:760px){
+  .osse-cal__filters{gap:.3rem}
+  .osse-cal .osse-cal__chip{padding:.4rem .5rem;font-size:.8rem}
+  .osse-cal .osse-cal__views .osse-cal__navbtn{padding:0 .45rem;font-size:.8rem}
+  .osse-cal__tools{gap:.75rem .5rem}
+}
+@container (min-width:680px){
+  .osse-cal__tools,.osse-cal__filters{flex-wrap:nowrap}
+  .osse-cal__filters{min-width:0}
+  .osse-cal__right{flex:none}
+}
 .osse-cal__views{display:flex;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden}
 .osse-cal__right{position:relative;display:flex;align-items:flex-start;gap:.5rem;margin-left:auto}
 .osse-cal__sub{position:static}
