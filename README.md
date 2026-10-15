@@ -79,7 +79,11 @@ window.addEventListener('message', function (e) {
 
 ### In WordPress
 
-Add a **Custom HTML** block (not the classic or visual editor, which mangles scripts) and paste one of the snippets above. Check the page preview before publishing. The live calendar page still uses the older inline snippet from `osse-wip`; this repo does not touch it.
+Add a **Custom HTML** block (not the classic or visual editor, which mangles scripts) and paste one of the snippets above. Check the page preview before publishing.
+
+On the classic editor, work in the **Text** tab only: the Visual tab (TinyMCE) rewrites the whole page, mangles scripts and drops unknown tags such as `<oceansailing-calendar>`. If the tag is needed there, use the placeholder `<div data-oceansailing-calendar></div>` (see above), which survives the Visual tab. Smush's lazy-load plugin delays iframes until they scroll into view; that is expected.
+
+The private test page `https://oceansailing.meder.hu/naptar/` (page ID 6306, "Magán: Naptár") has four sections: the Google iframe (option 1), the older inline script (option 2, from `osse-wip`), this calendar in an iframe (option 3, real data) and this calendar as the web component through the placeholder div (option 4, loaded with `?test`). Sections 3 and 4 were added by hand with the maintainer's explicit permission; sections 1 and 2 are untouched.
 
 ### Check that the embedding works
 
@@ -93,6 +97,7 @@ Add a **Custom HTML** block (not the classic or visual editor, which mangles scr
 | iframe has a scrollbar, wrong height | listener missing, `id` differs from `getElementById`, or the origin check fails (check the `calendar.navigart.net` spelling) |
 | script text or `&#038;` visible in the page | pasted outside a Custom HTML block |
 | Calendar ignores new styles | selector not specific enough; use `oceansailing-calendar.osse-cal` |
+| `<oceansailing-calendar>` tag disappears after saving in WordPress | the Visual tab removed it; use the Text tab or the `<div data-oceansailing-calendar></div>` placeholder |
 
 ## Event titles (for calendar editors)
 
@@ -134,7 +139,7 @@ Works on the published site too, e.g. https://calendar.navigart.net/?test. In Wo
 - **TODO:** refresh the test events (`dev/fixtures`) when their dates are old.
 - **TODO (manual checks):** `.ics` download and subscribe links on a phone, a real print preview, a screen-reader pass; the arrow-key navigation was reported as not working in a manual try, see SPEC section 9.
 - No automated tests; see the testing section in `SPEC.md`.
-- The previous version (inline snippet pasted into a WordPress page) lives in the `osse-wip` repo under `calendar/`. It is what the WordPress page uses today and is not touched by this repo.
+- The previous version (inline snippet pasted into a WordPress page) lives in the `osse-wip` repo under `calendar/`. It is not touched by this repo. The only WordPress change made from here is the two added sections on the private test page (see "In WordPress").
 
 ## License
 

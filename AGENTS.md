@@ -63,6 +63,8 @@ Google Calendar API v3 browser key in Google Cloud project "Navigart" (key "Navi
 
 ## Pitfalls
 - WordPress mangles `&` (see rule 7); the old inline snippet works around it by shipping its script as an escaped string run via `new Function`.
+- The private WP test page `/naptar/` (post 6306, classic editor) has sections 3 and 4 added by permission. Edit it only in the **Text** tab (the Visual tab rewrites everything), via the raw `#content` textarea, and back up the content first. It is private: anonymous requests (curl) get 404, only a logged-in browser sees it. Option 4 uses the placeholder div with `?test`.
+- Theme CSS leaks into the component (e.g. uppercase, letter-spaced buttons). Test with `test.html`, which imitates it, and in the real page.
 - Fixture dates are absolute (autumn 2026 to the end of 2028); refresh them when old. The dev server caches the fixtures module: restart it after editing `dev/fixtures`.
 - A key that works on the live site may still return 403 elsewhere: the referrer must match one of the allowed ones (port-less, e.g. `localhost/*`, `127.0.0.1/*`).
 - Playwright: lazily loaded months need ~1.5 s before inspecting; a mid-page `setViewportSize` can hang `page.screenshot` (go to `about:blank`, resize, then `goto`); `emulateMedia print` persists until reset to `screen`.
