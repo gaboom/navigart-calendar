@@ -31,16 +31,20 @@
   var MONTHS_BACK = 1;
   var MONTHS_AHEAD = 12;
   var GOOGLE_VIEW = 'https://calendar.google.com/calendar/embed?src=oceansailingse%40gmail.com&ctz=Europe%2FBudapest';
-  // Categories in filter order; the first matching pattern wins, "Egyéb" catches the rest.
-  // Colours run from cool to hot with the course level. Each category has a fallback page for events without a link in their description.
+  // Categories in filter (chip) order. A title is matched against the entries marked `first` before all others, then in the
+  // listed order; an entry without a pattern ("Skipper") is the fallback for everything else. Each category has a fallback page
+  // for events without a link in their description.
+  // Colours: levels run green, amber, orange, crimson, deep burgundy (darker and hotter with the level); the other categories use
+  // blue, purple and teal, which the level ramp avoids. White text must stay at 4.5:1 or better on every colour.
   var TYPES = [
-    { key: 'level-1', label: '1. szint', color: '#1d4ed8', test: /(^|\D)1\.\s*szint/i, page: '/turak/tengeri-vitorlas-tanfolyam/' },
-    { key: 'level-2', label: '2. szint', color: '#0f766e', test: /(^|\D)2\.\s*szint/i, page: '/turak/' },
-    { key: 'level-3', label: '3. szint', color: '#a16207', test: /(^|\D)3\.\s*szint/i, page: '/turak/' },
-    { key: 'level-4', label: '4. szint', color: '#c2410c', test: /(^|\D)4\.\s*szint/i, page: '/turak/' },
-    { key: 'level-5', label: '5. szint', color: '#b91c1c', test: /(^|\D)5\.\s*szint/i, page: '/turak/' },
+    { key: 'skipper', label: 'Skipper', color: '#1d4ed8', test: null, page: '/turak/' },
+    { key: 'level-1', label: '1. szint', color: '#15803d', test: /(^|\D)1\.\s*szint/i, page: '/turak/tengeri-vitorlas-tanfolyam/' },
+    { key: 'level-2', label: '2. szint', color: '#a16207', test: /(^|\D)2\.\s*szint/i, page: '/turak/' },
+    { key: 'level-3', label: '3. szint', color: '#c2410c', test: /(^|\D)3\.\s*szint/i, page: '/turak/' },
+    { key: 'level-4', label: '4. szint', color: '#9f1239', test: /(^|\D)4\.\s*szint/i, page: '/turak/' },
+    { key: 'level-5', label: '5. szint', color: '#4c0519', test: /(^|\D)5\.\s*szint/i, page: '/turak/' },
     { key: 'src', label: 'SRC', color: '#6d28d9', test: /\bSRC\b/i, page: '/tanuloi-tajekoztato-src/' },
-    { key: 'other', label: 'Egyéb', color: '#475569', test: /[\s\S]*/, page: '/turak/' }
+    { key: 'karibi', label: 'Karibi', color: '#0e7490', test: /karibi/i, first: true, page: '/karibi-vitorlasturak/' }
   ];
   // Icon shapes (24x24 viewBox, filled): download tray, calendar with plus, feed (subscribe).
   var ICONS = {
@@ -145,8 +149,10 @@
       return n;
     }
     function typeOf(title) {
-      for (var i = 0; i < TYPES.length; i++) { if (TYPES[i].test.test(title)) { return TYPES[i]; } }
-      return TYPES[TYPES.length - 1];
+      var i;
+      for (i = 0; i < TYPES.length; i++) { if (TYPES[i].first && TYPES[i].test.test(title)) { return TYPES[i]; } }
+      for (i = 0; i < TYPES.length; i++) { if (TYPES[i].test && TYPES[i].test.test(title)) { return TYPES[i]; } }
+      return TYPES[0];
     }
     function safeUrl(href) {
       try {

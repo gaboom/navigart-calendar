@@ -3,7 +3,7 @@
 How to work on this repo (humans and AI agents). *What* it is: `README.md`. *Why*, decisions and testing intentions: `SPEC.md`: read it before changing behaviour, and update it when a decision changes.
 
 ## Rules
-1. **Do not access or change WordPress** (https://oceansailing.meder.hu/, including read-only checks) unless the maintainer explicitly asks. The live page uses an older inline snippet from the `osse-wip` repo; this repo must never break it. If a WordPress test is ever approved: only *add* new sections, never edit existing ones.
+1. **Do not access or change WordPress** (https://oceansailing.meder.hu/, including read-only checks) unless the maintainer explicitly asks. Current state: the private page `/naptar/` (post 6306) holds only the placeholder div + the production script (no `?test`), rebuilt on the maintainer's explicit instruction; any further edit needs new explicit permission, a backup first and the Text tab only (see TESTING.md, "WordPress safety"). Other pages and settings stay untouched.
 2. **No commit or push** unless asked. Commit trailer when asked: `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`.
 3. The API key is part of the source, masked (`API_KEY_MASKED`). Never write the plain key anywhere (source, docs, logs, commit messages). Keep the Google Cloud referrer restrictions.
 4. No frameworks, no runtime dependencies, no extra abstraction layers. Dev scripts: Node 18+, plain ES modules.
@@ -14,6 +14,7 @@ How to work on this repo (humans and AI agents). *What* it is: `README.md`. *Why
 
 ## Layout
 ```
+README.md / SPEC.md / AGENTS.md / TESTING.md / KEY.md   what+embedding / why+decisions / how to work / how to test in a real browser / the API key
 src/oceansailing-calendar.js       the component: config at the top, annotated; mount(root) holds all per-instance state
 src/oceansailing-calendar.css      styles, scoped under .osse-cal (inlined into the JS by the build)
 src/index.html                     standalone / iframe page (height reporting; passes ?test on to the component script; fonts are loaded by the component)
@@ -43,27 +44,29 @@ Stop the dev server when done unless the maintainer wants to keep testing (find 
 - Per-instance state lives in `mount(root)`; `mount` returns a cleanup function (removes document listeners, closes the popover). New document-level listeners must be removed there.
 - Filters: `filters = { list, month }`, `null` (all selected) or an array of selected category keys per view; `toggle()` normalises empty/full to `null`.
 - Data: one shared `events` list, `months{}` tracks per-month load state (`loading` / `done` / `error`). Day arithmetic is in Europe/Budapest.
-- Categories, colours and fallback pages: `TYPES` (first match wins, `Egyéb` stays last). Window size: `MONTHS_BACK`, `MONTHS_AHEAD`. Calendar: `CALENDAR_ID` (must stay public). Look: CSS variables at the top of the CSS file.
+- Categories, colours and fallback pages: `TYPES` = chip order (Skipper first). Matching: entries with `first` (Karibi) before all others, then in order; the entry without a pattern (Skipper, `TYPES[0]`) is the fallback. Window size: `MONTHS_BACK`, `MONTHS_AHEAD`. Calendar: `CALENDAR_ID` (must stay public). Look: CSS variables at the top of the CSS file.
 - Month grid keyboard (SPEC F25): `cur` (shown month), `gridFocus` (day to focus after a re-render), `popKey` (popover identity), roving `tabindex` via `rovingDay`/`setRoving`, keys in `onGridKey`. Bars are `aria-hidden` and not focusable by design; day cells carry the semantics. Bars on neighbouring-month days are intended (do not clip); a month is "empty" only if the whole visible grid has no bar.
 - Build placeholder in the source: `'/*CSS*/'` in the component. Do not remove it; the build fails loudly if it is missing. Test mode lives in the component (`TEST`, `testFetch`, `apiFetch`); keep test data out of it (it belongs in `dev/fixtures`).
 
 ## API key
+Full guide (security model, rotation, incident steps, lessons learned): [`KEY.md`](KEY.md). The essentials:
 Google Calendar API v3 browser key in Google Cloud project "Navigart" (key "Navigart.net OceanSailing"). Restrictions: Calendar API only; HTTP referrers `*.navigart.net/*`, `navigart.net/*`, `oceansailing.meder.hu/*`, `localhost/*`, `127.0.0.1/*`, `gaboom.github.io/*` (GitHub Pages fallback address). SPEC.md section 7 has the same list; keep both in sync.
 - The key is part of the source, **masked**: `API_KEY_MASKED` in `src/oceansailing-calendar.js` (XOR with `MASK` + base64, decoded in the browser). No `.env`, no environment variable, no build-time injection.
 - To change the key: `npm run mask -- <new key>`, paste the output into `API_KEY_MASKED`, `npm run build`.
 - The build runs the shipped decoder on the shipped value, fails if the result is not shaped like a Google key (`AIza` + 35 characters) or if the plain key is in any output file, and prints the decoded key shortened (`AIza…abcd`) for comparison with Google Cloud. `npm run build:show-key` prints it in full for the owner's own use. Agents must never run it.
+- Do not reformat the `unmask` function in the source: the build extracts it with a regular expression (it must end with a line of two spaces and `}`).
 - Masking is camouflage for secret scanners, not security. Never remove the referrer restrictions. Never write the plain key into source, docs, logs or commit messages.
 
 ## Verify a change
 1. `npm run build` succeeds; `docs/` has no plain key (search for the key prefix `AIza`); a second build gives no diff.
 2. `npm run dev`, then run the checklist from `SPEC.md` section 7 against `/?test`, `/?test&delay=3000`, `/?test&fail` and `/test.html?test`. Minimum for any UI change: list view, month view (page back and forward), filters per view, popover (including a real Esc press), month grid keyboard (arrows, PageUp/PageDown, Enter), 390 px viewport, iframe auto-height, no console errors. Header row (chips left, subscribe and Lista/Hónap right) stays one row at 900 px even with the theme's uppercase, letter-spaced buttons (`test.html` imitates it). Framed document must not scroll: `documentElement.scrollHeight <= clientHeight` inside the iframe (the margin of the last card once leaked past the component and caused a scrollbar).
 3. Smoke test the real API at `http://localhost:8765/` (no `?test`).
-4. Test in a **visible foreground** browser window: hidden tabs throttle timers and make loading/retry checks look broken. With Playwright, prefer `page.evaluate` clicks for iframe content and generous waits.
+4. Test in a **visible foreground** browser window: hidden tabs throttle timers and make loading/retry checks look broken. With Playwright, prefer `page.evaluate` clicks for iframe content and generous waits. Practices, quirks and the key-in-logs warning (`browser_network_requests` prints it): [`TESTING.md`](TESTING.md).
 5. Update `README.md` (what), `SPEC.md` (why/decisions/tests) and this file (how) when they are affected.
 
 ## Pitfalls
 - WordPress mangles `&` (see rule 7); the old inline snippet works around it by shipping its script as an escaped string run via `new Function`.
-- The private WP test page `/naptar/` (post 6306, classic editor) has sections 3 and 4 added by permission. Edit it only in the **Text** tab (the Visual tab rewrites everything), via the raw `#content` textarea, and back up the content first. It is private: anonymous requests (curl) get 404, only a logged-in browser sees it. Option 4 uses the placeholder div with `?test`.
+- The private WP page `/naptar/` (post 6306, classic editor) contains only the placeholder div + the production script. Edit it only with explicit permission, in the **Text** tab (the Visual tab rewrites everything), via the raw `#content` textarea, and back up the content first. It is private: anonymous requests (curl) get 404, only a logged-in browser sees it. Never leave `?test` on it.
 - Theme CSS leaks into the component (e.g. uppercase, letter-spaced buttons). Test with `test.html`, which imitates it, and in the real page.
 - Fixture dates are absolute (autumn 2026 to the end of 2028); refresh them when old. The dev server caches the fixtures module: restart it after editing `dev/fixtures`.
 - A key that works on the live site may still return 403 elsewhere: the referrer must match one of the allowed ones (port-less, e.g. `localhost/*`, `127.0.0.1/*`).

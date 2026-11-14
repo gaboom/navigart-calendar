@@ -1,6 +1,6 @@
 // Synthetic events for reviewing the look locally. NOT real club data and never part of the production snippet.
 // They are served by test mode (the component fetches docs/test-events.json, built from this file and real-events.json) in place of the Google API, and cover the cases the UI must handle:
-// every level (1-5), SRC, Egyéb, past events, events outside the first data window (x10 and x11, loaded on demand in month view),
+// every level (1-5), SRC, Karibi (also one that carries a level in its title, x37: Karibi wins), Skipper (everything else), past events, events outside the first data window (x10 and x11, loaded on demand in month view),
 // events crossing a year boundary, an event ending exactly at midnight, a day with two events (28 Nov 2026, x6 and x14) and one with three (10 Apr 2027, x20-x22), a trip across the spring DST change (x19), links in descriptions (good, unsafe, long) and plain text.
 // The shape is the Google Calendar API v3 events.list item shape (only the fields the snippet requests).
 export const sampleEvents = [
@@ -50,7 +50,7 @@ export const sampleEvents = [
     description: '', start: { dateTime: '2026-10-17T09:00:00+02:00' }, end: { dateTime: '2026-10-17T16:00:00+02:00' } },
   { id: 'x16', status: 'confirmed', summary: 'Őszi regatta (3. szint)', location: 'Siófok',
     description: '', start: { dateTime: '2026-10-30T16:00:00+01:00' }, end: { dateTime: '2026-11-01T14:00:00+01:00' } },
-  { id: 'x17', status: 'confirmed', summary: 'Elsősegély tanfolyam (Egyéb)', location: 'Budapest, Klubhelyiség',
+  { id: 'x17', status: 'confirmed', summary: 'Elsősegély tanfolyam', location: 'Budapest, Klubhelyiség',
     description: '', start: { dateTime: '2027-01-14T18:00:00+01:00' }, end: { dateTime: '2027-01-14T21:00:00+01:00' } },
   { id: 'x18', status: 'confirmed', summary: 'Téli elmélet (2. szint)', location: 'Budapest, Klubhelyiség',
     description: '', start: { dateTime: '2027-01-23T10:00:00+01:00' }, end: { dateTime: '2027-01-24T16:00:00+01:00' } },
@@ -64,13 +64,13 @@ export const sampleEvents = [
     description: '', start: { dateTime: '2027-04-10T18:00:00+02:00' }, end: { dateTime: '2027-04-10T20:00:00+02:00' } },
   { id: 'x23', status: 'confirmed', summary: 'Kvarner körút (2. szint)', location: 'Rijeka, Horvátország',
     description: '', start: { dateTime: '2027-07-03T16:00:00+02:00' }, end: { dateTime: '2027-07-10T09:00:00+02:00' } },
-  { id: 'x24', status: 'confirmed', summary: 'Gyermek vitorlástábor (Egyéb)', location: 'Balatonfüred',
+  { id: 'x24', status: 'confirmed', summary: 'Gyermek vitorlástábor', location: 'Balatonfüred',
     description: '', start: { date: '2027-07-19' }, end: { date: '2027-07-24' } },
   { id: 'x25', status: 'confirmed', summary: 'Kornaták (4. szint)', location: 'Šibenik, Horvátország',
     description: '', start: { dateTime: '2027-09-11T16:00:00+02:00' }, end: { dateTime: '2027-09-18T09:00:00+02:00' } },
   { id: 'x26', status: 'confirmed', summary: 'SRC felkészítő (SRC)', location: 'Budapest',
     description: '', start: { date: '2027-10-23' }, end: { date: '2027-10-25' } },
-  { id: 'x27', status: 'confirmed', summary: 'Időátállás utáni előadás (Egyéb)', location: 'Budapest, Klubhelyiség',
+  { id: 'x27', status: 'confirmed', summary: 'Időátállás utáni előadás', location: 'Budapest, Klubhelyiség',
     description: '', start: { dateTime: '2027-11-10T18:00:00+01:00' }, end: { dateTime: '2027-11-10T20:00:00+01:00' } },
   { id: 'x28', status: 'confirmed', summary: 'Újévi vitorlázás (5. szint)', location: 'Kanári-szigetek',
     description: '', start: { date: '2027-12-26' }, end: { date: '2028-01-09' } },
@@ -84,8 +84,14 @@ export const sampleEvents = [
     description: '', start: { dateTime: '2028-06-24T16:00:00+02:00' }, end: { dateTime: '2028-07-08T09:00:00+02:00' } },
   { id: 'x33', status: 'confirmed', summary: 'SRC rádiós tanfolyam (SRC)', location: 'Budapest',
     description: '', start: { date: '2028-09-09' }, end: { date: '2028-09-12' } },
-  { id: 'x34', status: 'confirmed', summary: 'Szezonzáró (Egyéb)', location: 'Balatonfüred',
+  { id: 'x34', status: 'confirmed', summary: 'Szezonzáró', location: 'Balatonfüred',
     description: '', start: { dateTime: '2028-10-28T12:00:00+02:00' }, end: { dateTime: '2028-10-28T22:00:00+02:00' } },
   { id: 'x35', status: 'confirmed', summary: 'Óceáni átkelés (5. szint)', location: 'Kanári-szigetek',
     description: '', start: { date: '2028-11-12' }, end: { date: '2028-12-03' } },
+  { id: 'x36', status: 'confirmed', summary: 'Karibi vitorlástúra', location: 'Karib-tenger',
+    description: '', start: { date: '2027-01-23' }, end: { date: '2027-01-31' } },
+  { id: 'x37', status: 'confirmed', summary: 'Karibi felkészítő (3. szint)', location: 'Budapest, Klubhelyiség',
+    description: '', start: { dateTime: '2028-03-04T10:00:00+01:00' }, end: { dateTime: '2028-03-04T14:00:00+01:00' } },
+  { id: 'x38', status: 'confirmed', summary: 'Horvát C tanfolyam', location: 'Budapest',
+    description: '', start: { date: '2027-03-19' }, end: { date: '2027-03-23' } },
 ];
