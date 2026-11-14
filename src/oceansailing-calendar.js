@@ -524,6 +524,19 @@
       b.onclick = onclick;
       return b;
     }
+    // The days the month grid shows: the month padded to whole weeks, so bars of neighbouring months count.
+    function gridDays(i) {
+      var y = Math.floor(i / 12);
+      var m = i % 12;
+      var first = Date.UTC(y, m, 1) / 864e5;
+      var days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+      var offset = (new Date(first * 864e5).getUTCDay() + 6) % 7;
+      return [first - offset, first - offset + Math.ceil((offset + days) / 7) * 7 - 1];
+    }
+    function inGrid(list, i) {
+      var g = gridDays(i);
+      return list.filter(function (e) { return e.d1 >= g[0] && e.d0 <= g[1]; }).length;
+    }
     // Each week is a 7-column grid: day cells in the back, one row per lane of event bars on top.
     function renderMonth(shown) {
       var y = Math.floor(cursor / 12);
@@ -569,7 +582,7 @@
       box.appendChild(grid);
       if (empty) {
         var nd = el('p', 'osse-cal__nodata');
-        nd.appendChild(el('span', null, filters.month ? 'Ebben a hónapban nincs ilyen esemény.' : 'Ebben a hónapban nincs esemény.'));
+        nd.appendChild(el('span', null, filters.month && inGrid(events, cursor) ? 'Ebben a hónapban nincs a keresésnek megfelelő esemény.' : 'Ebben a hónapban nincs esemény.'));
         box.appendChild(nd);
       }
       root.appendChild(box);
@@ -819,9 +832,10 @@
       clear();
       root.classList.toggle('osse-cal--busy', view === 'month' && months[cursor] === 'loading');
       prune();
-      var chips = present();
-      var locked = chips.length === 0;
-      if (locked) { chips = TYPES; }
+      // Locked chips: nothing to filter. No event at all (list), or the shown month has none whatever the filter (month). All categories are
+      // shown selected and cannot be toggled; the stored filter is left alone and returns on the next month that has events.
+      var locked = present().length === 0 || (view === 'month' && months[cursor] === 'done' && !inGrid(events, cursor));
+      var chips = locked ? TYPES : present();
       var tools = el('div', 'osse-cal__tools');
       var bar = el('div', 'osse-cal__filters');
       bar.setAttribute('role', 'group');
@@ -830,7 +844,7 @@
         var b = el('button', 'osse-cal__chip', t.label);
         b.type = 'button';
         b.style.setProperty('--c', t.color);
-        b.setAttribute('aria-pressed', String(isOn(t.key)));
+        b.setAttribute('aria-pressed', String(locked || isOn(t.key)));
         if (locked) { b.setAttribute('aria-disabled', 'true'); } else { b.onclick = function () { toggle(t.key); render(); }; }
         bar.appendChild(b);
       });
