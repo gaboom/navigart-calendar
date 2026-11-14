@@ -41,8 +41,7 @@ oceansailing-calendar{display:flow-root}
 .osse-cal .osse-cal__view[aria-pressed="true"]{background:var(--ink);color:#fff}
 .osse-cal__chip{padding:.4rem .95rem;border:2px solid var(--c);border-radius:var(--r);background:transparent;color:inherit;font:inherit;font-size:.9rem;line-height:1.2;cursor:pointer}
 .osse-cal__chip[aria-pressed="true"]{background:var(--c);color:#fff}
-.osse-cal__chip--empty:not([aria-pressed="true"]){border-style:dashed}
-.osse-cal__chip--empty[aria-pressed="true"]{border-style:dashed;background:#fff;background:color-mix(in srgb,var(--c) 10%,#fff);color:inherit}
+.osse-cal__chip[aria-disabled="true"]{cursor:default}
 .osse-cal .osse-cal__card--over{background:#eceef1;border-left-color:#9aa1ab;color:#555b66}
 .osse-cal .osse-cal__card--over .osse-cal__day,.osse-cal .osse-cal__card--over .osse-cal__meta,.osse-cal .osse-cal__card--over .osse-cal__desc{color:#555b66}
 .osse-cal .osse-cal__card--over .osse-cal__meta a{color:var(--blue-dark)}

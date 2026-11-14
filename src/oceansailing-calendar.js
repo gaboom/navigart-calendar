@@ -725,13 +725,28 @@
       var f = filters[view];
       return !f || f.indexOf(key) >= 0;
     }
+    // Only categories that have a loaded event get a chip. Without any event all chips are shown, selected and locked.
+    function present() {
+      var have = {};
+      events.forEach(function (e) { have[e.type.key] = true; });
+      return TYPES.filter(function (t) { return have[t.key]; });
+    }
+    // A category that has no chip must not stay selected, or the filter could not be undone. Runs before every draw, for both views.
+    // Selecting every shown chip, or none, is the "all" state (null).
+    function prune() {
+      var keys = present().map(function (t) { return t.key; });
+      ['list', 'month'].forEach(function (v) {
+        var f = filters[v];
+        if (!f) { return; }
+        f = f.filter(function (k) { return keys.indexOf(k) >= 0; });
+        filters[v] = f.length === 0 || f.length >= keys.length ? null : f;
+      });
+    }
     // All categories are selected by default. Clicking one then selects only that one; after that chips are added or removed one by one.
-    // Removing the last selected chip, or selecting every chip, goes back to the "all" state (null).
     function toggle(key) {
       var f = filters[view];
       if (!f) { filters[view] = [key]; return; }
-      f = f.indexOf(key) >= 0 ? f.filter(function (k) { return k !== key; }) : f.concat(key);
-      filters[view] = f.length === 0 || f.length === TYPES.length ? null : f;
+      filters[view] = f.indexOf(key) >= 0 ? f.filter(function (k) { return k !== key; }) : f.concat(key);
     }
     function visible() {
       return events.filter(function (e) { return isOn(e.type.key); });
@@ -803,19 +818,20 @@
       closePop();
       clear();
       root.classList.toggle('osse-cal--busy', view === 'month' && months[cursor] === 'loading');
-      var count = {};
-      events.forEach(function (e) { count[e.type.key] = (count[e.type.key] || 0) + 1; });
+      prune();
+      var chips = present();
+      var locked = chips.length === 0;
+      if (locked) { chips = TYPES; }
       var tools = el('div', 'osse-cal__tools');
       var bar = el('div', 'osse-cal__filters');
       bar.setAttribute('role', 'group');
       bar.setAttribute('aria-label', 'Kategóriák');
-      TYPES.forEach(function (t) {
-        var b = el('button', count[t.key] ? 'osse-cal__chip' : 'osse-cal__chip osse-cal__chip--empty', t.label);
-        if (!count[t.key]) { b.title = 'Nincs esemény'; }
+      chips.forEach(function (t) {
+        var b = el('button', 'osse-cal__chip', t.label);
         b.type = 'button';
         b.style.setProperty('--c', t.color);
         b.setAttribute('aria-pressed', String(isOn(t.key)));
-        b.onclick = function () { toggle(t.key); render(); };
+        if (locked) { b.setAttribute('aria-disabled', 'true'); } else { b.onclick = function () { toggle(t.key); render(); }; }
         bar.appendChild(b);
       });
       var views = el('div', 'osse-cal__views');
@@ -832,10 +848,9 @@
       right.appendChild(views);
       tools.appendChild(right);
       root.appendChild(tools);
-      var active = filters[view];
       var shown = visible();
       if (view === 'month') { renderMonth(shown); return; }
-      if (!shown.length) { root.appendChild(el('p', 'osse-cal__msg', active ? 'A kiválasztott kategóriákban nincs esemény.' : 'Jelenleg nincs meghirdetett esemény.')); return; }
+      if (!shown.length) { root.appendChild(el('p', 'osse-cal__msg', 'Jelenleg nincs meghirdetett esemény.')); return; }
       var month = '';
       shown.forEach(function (e) {
         var m = fmt(e.start, e.allDay, { year: 'numeric', month: 'long' });

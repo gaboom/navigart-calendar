@@ -10,7 +10,7 @@ The calendar of **Ocean Sailing SE** (https://oceansailing.meder.hu/), built liv
 
 - **Two views.** "Lista" (list grouped by month) and "Hónap" (month grid with multi-day bars; on phones, tap a day to see its events).
 - **Colour-coded categories** from the event title: `1. szint` ... `5. szint` (green, amber, orange, crimson, burgundy), `SRC`, `Karibi` (any title containing "karibi"), `Skipper` (everything else).
-- **Filters** per category. Multi-select, all selected by default (the first click selects only that category). Each view has its own filter.
+- **Filters** per category. Multi-select, all selected by default (the first click selects only that category). Each view has its own filter. Categories without a loaded event show no chip.
 - **Right link for every event.** The first link in the event description, otherwise the matching club page. Club links leave the iframe when embedded.
 - **Month paging on demand.** Paging in month view loads one month at a time ("Betöltés…"). Loaded months also appear in the list view, so going back in time in month view reveals older events in the list.
 - **Event popover** in month view (Esc, outside click or × closes it). A day with several events opens a day popover. Past events say "Lezárult" and offer no add-to-calendar.
