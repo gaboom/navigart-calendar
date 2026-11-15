@@ -39,6 +39,7 @@ How to test this calendar in a real browser. *What* to check is the checklist in
 | Referrer failure | fetch the API from a page with a different referrer (for example `<meta name="referrer" content="no-referrer">` injected on a local page) | the component shows "A naptár most nem érhető el." and the console shows 403 |
 | Slow and failing API | `/?test&delay=3000`, `/?test&fail` | "Betöltés…", then the error with "Újra"; retry recovers |
 | Keyboard | Tab into the grid, arrows, Home/End, PageUp/PageDown, Enter, real Esc | focus stays on a day cell; Esc returns focus there |
+| Analytics consent | standalone `playwright-core` with a fresh context per case; mock the page and the API with `route` (page URL on `oceansailing.meder.hu` for the web component, on `calendar.navigart.net` for the own page), set the cookie `cookie_notice_accepted=true` (or body class `cookies-accepted`, or dispatch `document` event `setCookieNotice` with `detail.value` `true`) and **block** `googletagmanager.com` / `google-analytics.com` | club page without consent: no GTM script, request or `dataLayer`; with consent: one `gtm.js?id=` request, no event replayed from before consent, `calendar_*` events in `dataLayer`; `calendar.navigart.net` (top and framed): loaded without any consent; none in `?test`. The real banner appears only in a headed Chromium with a normal user agent |
 | Editor round trip (WordPress) | open the page in the classic editor | the placeholder survives; always edit in the Text tab |
 
 ## After publishing (GitHub Pages)

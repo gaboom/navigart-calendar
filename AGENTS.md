@@ -46,6 +46,7 @@ Stop the dev server when done unless the maintainer wants to keep testing (find 
 - Data: one shared `events` list, `months{}` tracks per-month load state (`loading` / `done` / `error`). Day arithmetic is in Europe/Budapest.
 - Categories, colours and fallback pages: `TYPES` = chip order (Skipper first). Matching: entries with `first` (Karibi) before all others, then in order; the entry without a pattern (Skipper, `TYPES[0]`) is the fallback. Window size: `MONTHS_BACK`, `MONTHS_AHEAD`. Calendar: `CALENDAR_ID` (must stay public). Look: CSS variables at the top of the CSS file.
 - Month grid keyboard (SPEC F25): `cur` (shown month), `gridFocus` (day to focus after a re-render), `popKey` (popover identity), roving `tabindex` via `rovingDay`/`setRoving`, keys in `onGridKey`. Bars are `aria-hidden` and not focusable by design; day cells carry the semantics. Bars on neighbouring-month days are intended (do not clip); a month is "empty" only if the whole visible grid has no bar.
+- Analytics (SPEC F28, D22): `GTM_ID`, `OWN_PAGE`, `consented()`, `startAnalytics()`, `track()` at the top; click events by delegation in `onTrack` (capture, removed in the `mount` cleanup), `calendar_event_open` in `openPop`. Own origin (`calendar.navigart.net`, incl. iframe content) always loads; as a web component on another site fail closed on the host's cookie consent, not when framed there; never in test mode. Keep the ID in the script, never in embed attributes. Never log or send event titles.
 - Build placeholder in the source: `'/*CSS*/'` in the component. Do not remove it; the build fails loudly if it is missing. Test mode lives in the component (`TEST`, `testFetch`, `apiFetch`); keep test data out of it (it belongs in `dev/fixtures`).
 
 ## API key
@@ -65,6 +66,7 @@ Google Calendar API v3 browser key in Google Cloud project "Navigart" (key "Navi
 5. Update `README.md` (what), `SPEC.md` (why/decisions/tests) and this file (how) when they are affected.
 
 ## Pitfalls
+- **Never let tests reach the real GTM container**: it feeds the maintainer's GA. Block `**/googletagmanager.com/**` and `**/google-analytics.com/**` with `page.route` in any test with consent, and never accept the cookie banner on the live site with real traffic unblocked.
 - WordPress mangles `&` (see rule 7); the old inline snippet works around it by shipping its script as an escaped string run via `new Function`.
 - The private WP page `/naptar/` (post 6306, classic editor) contains only the placeholder div + the production script. Edit it only with explicit permission, in the **Text** tab (the Visual tab rewrites everything), via the raw `#content` textarea, and back up the content first. It is private: anonymous requests (curl) get 404, only a logged-in browser sees it. Never leave `?test` on it.
 - Theme CSS leaks into the component (e.g. uppercase, letter-spaced buttons). Test with `test.html`, which imitates it, and in the real page.

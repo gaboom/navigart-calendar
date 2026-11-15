@@ -92,6 +92,37 @@
     });
   }
   function apiFetch(url, opts) { return TEST ? testFetch(url) : fetch(url, opts); }
+  // Analytics (Google Tag Manager). The container ID is part of this script, never of the embedding page. Two cases, never in test mode:
+  // 1. Our own page (calendar.navigart.net: the standalone page and the iframe content): loaded always, whatever the host page's cookie policy.
+  // 2. Embedded as a web component in another page (the club site): only after that site's cookie banner (the "Cookie Notice" plugin) has been
+  //    accepted; without consent nothing is loaded and nothing is queued. Not inside a frame there (a frame cannot see the consent).
+  // The three consent signals below are the plugin's own: the cookie, the body class, and the document event it fires on a click.
+  var GTM_ID = 'GTM-5WJQTQDZ';
+  var OWN_PAGE = location.hostname === 'calendar.navigart.net';
+  var analyticsOn = false;
+  function consented() {
+    return !FRAMED && (/(^|;\s*)cookie_notice_accepted=true(;|$)/.test(document.cookie) || !!(document.body && document.body.classList.contains('cookies-accepted')));
+  }
+  function startAnalytics() {
+    if (analyticsOn || TEST) { return; }
+    analyticsOn = true;
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { window.dataLayer.push(arguments); }
+    gtag('js', new Date());
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    if (!document.querySelector('script[src*="googletagmanager.com/gtm.js?id=' + GTM_ID + '"]')) {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtm.js?id=' + GTM_ID;
+      document.head.appendChild(s);
+    }
+  }
+  // Events carry only the category and the kind of action, never an event title or any visitor data.
+  function track(name, params) {
+    if (analyticsOn) { window.dataLayer.push(Object.assign({ event: name }, params)); }
+  }
+  document.addEventListener('setCookieNotice', function (ev) { if (!FRAMED && ev.detail && String(ev.detail.value) === 'true') { startAnalytics(); } });
+  if (OWN_PAGE || consented()) { startAnalytics(); }
   if (TEST) {
     window.__delay = Number(TEST.get('delay')) || 350;
     window.__fail = TEST.has('fail');
@@ -482,6 +513,7 @@
       p.scrollIntoView({ block: 'nearest' });
     }
     function openPop(e, anchor, opener, key) {
+      track('calendar_event_open', { category: e.type.label });
       var d = parseDescription(e.description);
       var w = when(e);
       var p = popFrame(e.title, e.type.color, e.title, e.type.label);
@@ -878,6 +910,21 @@
       if (!(ev.target.closest && ev.target.closest('.osse-cal__sub'))) { closeSub(false); }
     }
     function onNarrow() { if (view === 'month') { render(); } }
+    // Analytics events by delegation (capture phase: runs before the handlers that rebuild the DOM). Nothing happens without consent.
+    function onTrack(ev) {
+      if (!analyticsOn || !ev.target.closest) { return; }
+      var t = ev.target.closest('a, button');
+      if (!t) { return; }
+      var box = t.closest('.osse-cal__card, .osse-cal__pop');
+      var tag = box && box.querySelector('.osse-cal__tag, .osse-cal__poptag');
+      var cat = tag ? tag.textContent : undefined;
+      if (t.classList.contains('osse-cal__chip')) { if (t.getAttribute('aria-disabled') !== 'true') { track('calendar_filter', { view: view, category: t.textContent.replace(/\s+/g, ' ').trim() }); } }
+      else if (t.classList.contains('osse-cal__view')) { track('calendar_view', { view: t.textContent === 'Hónap' ? 'month' : 'list' }); }
+      else if (t.classList.contains('osse-cal__open') || (box && t.parentNode.classList.contains('osse-cal__title'))) { track('calendar_detail', { category: cat }); }
+      else if (t.classList.contains('osse-cal__act')) { track('calendar_add', { method: t.tagName === 'A' ? 'google' : 'ics', category: cat }); }
+      else if (t.closest('.osse-cal__subpanel')) { track('calendar_subscribe', { method: /^webcal:/.test(t.href) ? 'ical' : 'google' }); }
+    }
+    root.addEventListener('click', onTrack, true);
     document.addEventListener('keydown', onKey);
     document.addEventListener('mousedown', onMouse);
     narrow.addEventListener('change', onNarrow);
@@ -965,6 +1012,7 @@
       alive = false;
       ctrl.abort();
       document.removeEventListener('keydown', onKey);
+      root.removeEventListener('click', onTrack, true);
       document.removeEventListener('mousedown', onMouse);
       narrow.removeEventListener('change', onNarrow);
       clearTimeout(sayTimer);
