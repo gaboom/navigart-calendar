@@ -24,7 +24,7 @@ oceansailing-calendar{display:flow-root}
 .osse-cal__views{display:flex;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden}
 .osse-cal__right{position:relative;display:flex;align-items:flex-start;gap:.5rem;margin-left:auto}
 .osse-cal__sub{position:static}
-.osse-cal summary.osse-cal__subbtn{display:flex;align-items:center;justify-content:center;width:2.25rem;padding:0;list-style:none}
+.osse-cal summary.osse-cal__subbtn{display:flex;align-items:center;justify-content:center;width:2.1rem;height:auto;min-height:0;padding:.4rem 0;font-size:.9rem;line-height:1.2;list-style:none}
 .osse-cal summary.osse-cal__subbtn::-webkit-details-marker{display:none}
 .osse-cal .osse-cal__sub[open]>.osse-cal__subbtn{background:var(--ink);color:#fff}
 .osse-cal__subpanel{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:15rem;padding:.8rem 1rem;border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:.85rem;line-height:1.45}
@@ -32,7 +32,7 @@ oceansailing-calendar{display:flow-root}
 .osse-cal .osse-cal__subpanel a{display:block;padding:.15rem 0;color:var(--blue);text-decoration:none}
 .osse-cal .osse-cal__subpanel a:hover,.osse-cal .osse-cal__subpanel a:focus-visible{color:var(--blue-dark);text-decoration:underline;text-underline-offset:2px}
 .osse-cal__ico{width:1.05em;height:1.05em;vertical-align:-.18em;fill:currentColor}
-.osse-cal summary.osse-cal__subbtn .osse-cal__ico{width:1.15rem;height:1.15rem;vertical-align:0}
+.osse-cal summary.osse-cal__subbtn .osse-cal__ico{width:1.08rem;height:1.08rem;vertical-align:0}
 .osse-cal .osse-cal__acts{display:inline-flex;gap:.6rem;white-space:nowrap}
 .osse-cal .osse-cal__act{position:relative;z-index:1;display:inline-flex;align-items:center;gap:.3em;padding:0;border:0;border-radius:0;background:transparent;color:var(--blue);font:inherit;line-height:inherit;text-decoration:none;cursor:pointer;box-shadow:none}
 .osse-cal .osse-cal__act:hover,.osse-cal .osse-cal__act:focus-visible{background:transparent;color:var(--blue-dark);text-decoration:none}

@@ -5,8 +5,9 @@
  *  - Reads events straight from the Google Calendar API v3 (events.list) with a browser API key.
  *  - Renders DOM nodes only (no innerHTML). One instance per element; state lives in mount().
  *  - Two views on one shared event list: "Lista" (list, grouped by month) and "Hónap" (month grid).
- *  - Data window: 1 month back to 12 months ahead on first load; month view then fetches any other
- *    month on demand and merges it into the same list (so the list view shows it afterwards).
+ *  - Data window: the current month to 12 months ahead on first load; month view then fetches any other
+ *    month on demand and merges it into the same list. The list shows only active events (ending today or later),
+ *    so past months loaded in month view never appear there; loaded future months do.
  *  - Categories (filters, colours, fallback links) are derived from the event title; see TYPES.
  *  - Calendar days are computed in Europe/Budapest, whatever the visitor's own time zone is.
  *  - The CSS is inlined by the build (scripts/build.mjs) and injected once into <head>.
@@ -28,16 +29,16 @@
   // Inside an iframe, club page links must replace the whole page, not just the frame.
   var FRAMED = window.self !== window.top;
   var TZ = 'Europe/Budapest';
-  var MONTHS_BACK = 1;
+  var MONTHS_BACK = 0;
   var MONTHS_AHEAD = 12;
   var GOOGLE_VIEW = 'https://calendar.google.com/calendar/embed?src=oceansailingse%40gmail.com&ctz=Europe%2FBudapest';
   // Categories in filter (chip) order. A title is matched against the entries marked `first` before all others, then in the
-  // listed order; an entry without a pattern ("Skipper") is the fallback for everything else. Each category has a fallback page
+  // listed order; an entry without a pattern ("Tanfolyam") is the fallback for everything else. Each category has a fallback page
   // for events without a link in their description.
   // Colours: levels run green, amber, orange, crimson, deep burgundy (darker and hotter with the level); the other categories use
   // blue, purple and teal, which the level ramp avoids. White text must stay at 4.5:1 or better on every colour.
   var TYPES = [
-    { key: 'skipper', label: 'Skipper', color: '#1d4ed8', test: null, page: '/turak/' },
+    { key: 'course', label: 'Tanfolyam', color: '#1d4ed8', test: null, page: '/turak/' },
     { key: 'level-1', label: '1. szint', color: '#15803d', test: /(^|\D)1\.\s*szint/i, page: '/turak/tengeri-vitorlas-tanfolyam/' },
     { key: 'level-2', label: '2. szint', color: '#a16207', test: /(^|\D)2\.\s*szint/i, page: '/turak/' },
     { key: 'level-3', label: '3. szint', color: '#c2410c', test: /(^|\D)3\.\s*szint/i, page: '/turak/' },
@@ -391,8 +392,8 @@
       // An event ending exactly at midnight still belongs to the previous day.
       var last = !allDay && end > start ? new Date(end.getTime() - 1) : end;
       var d1 = dayNum(last, allDay);
-      // All-day events end with their last calendar day in the club's time zone, not at UTC midnight.
-      var over = allDay ? d1 < dayNum(new Date(), false) : end <= Date.now();
+      // An event is active until the end of its last calendar day (club time zone): one that ended earlier today still counts as current.
+      var over = d1 < dayNum(new Date(), false);
       return { id: it.id, title: it.summary || '(cím nélkül)', location: it.location || '', description: it.description || '', allDay: allDay, start: start, end: end, last: last, d0: dayNum(start, allDay), d1: d1, over: over, type: typeOf(it.summary || ''), seq: it.sequence || 0, updated: it.updated ? new Date(it.updated) : null };
     }
     // Calendar day as a whole number (days since 1970-01-01) in the club's time zone, so spans can be compared and laid out on a grid.
@@ -770,19 +771,23 @@
       var f = filters[view];
       return !f || f.indexOf(key) >= 0;
     }
-    // Only categories that have a loaded event get a chip. Without any event all chips are shown, selected and locked.
-    function present() {
+    // The list shows only active events (ending today or later); the month view shows everything that is loaded, past months included.
+    function pool(v) {
+      return v === 'list' ? events.filter(function (e) { return !e.over; }) : events;
+    }
+    // Only categories that have an event in the view's pool get a chip. Without any event all chips are shown, selected and locked.
+    function present(v) {
       var have = {};
-      events.forEach(function (e) { have[e.type.key] = true; });
+      pool(v || view).forEach(function (e) { have[e.type.key] = true; });
       return TYPES.filter(function (t) { return have[t.key]; });
     }
-    // A category that has no chip must not stay selected, or the filter could not be undone. Runs before every draw, for both views.
+    // A category that has no chip must not stay selected, or the filter could not be undone. Runs before every draw, for both views (each against its own chips).
     // Selecting every shown chip, or none, is the "all" state (null).
     function prune() {
-      var keys = present().map(function (t) { return t.key; });
       ['list', 'month'].forEach(function (v) {
         var f = filters[v];
         if (!f) { return; }
+        var keys = present(v).map(function (t) { return t.key; });
         f = f.filter(function (k) { return keys.indexOf(k) >= 0; });
         filters[v] = f.length === 0 || f.length >= keys.length ? null : f;
       });
@@ -794,7 +799,7 @@
       filters[view] = f.indexOf(key) >= 0 ? f.filter(function (k) { return k !== key; }) : f.concat(key);
     }
     function visible() {
-      return events.filter(function (e) { return isOn(e.type.key); });
+      return pool(view).filter(function (e) { return isOn(e.type.key); });
     }
     function summary() {
       var f = filters[view];
@@ -840,7 +845,6 @@
       btn.setAttribute('aria-label', label);
       btn.appendChild(svgIcon(ICONS.feed));
       var panel = el('div', 'osse-cal__subpanel');
-      panel.appendChild(el('p', null, 'Feliratkozás az összes eseményre, automatikus frissítéssel:'));
       [['Google Naptár', FEED_GOOGLE], ['Apple Naptár, Outlook', FEED_WEBCAL]].forEach(function (l) {
         var a = el('a', null, l[0]);
         a.href = l[1];

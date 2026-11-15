@@ -1,6 +1,6 @@
 // Synthetic events for reviewing the look locally. NOT real club data and never part of the production snippet.
 // They are served by test mode (the component fetches docs/test-events.json, built from this file and real-events.json) in place of the Google API, and cover the cases the UI must handle:
-// every level (1-5), SRC, Karibi (also one that carries a level in its title, x37: Karibi wins), Skipper (everything else), past events, events outside the first data window (x10 and x11, loaded on demand in month view),
+// every level (1-5), SRC, Karibi (also one that carries a level in its title, x37: Karibi wins), Tanfolyam (everything else), past events (listed only in month view; x16 is a past event inside the current month, x15 and x9 are in earlier months), events outside the first data window (x10 and x11, loaded on demand in month view),
 // events crossing a year boundary, an event ending exactly at midnight, a day with two events (28 Nov 2026, x6 and x14) and one with three (10 Apr 2027, x20-x22), a trip across the spring DST change (x19), links in descriptions (good, unsafe, long) and plain text.
 // The shape is the Google Calendar API v3 events.list item shape (only the fields the snippet requests).
 export const sampleEvents = [

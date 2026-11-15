@@ -9,10 +9,11 @@ The calendar of **Ocean Sailing SE** (https://oceansailing.meder.hu/), built liv
 ## What it does
 
 - **Two views.** "Lista" (list grouped by month) and "Hónap" (month grid with multi-day bars; on phones, tap a day to see its events).
-- **Colour-coded categories** from the event title: `1. szint` ... `5. szint` (green, amber, orange, crimson, burgundy), `SRC`, `Karibi` (any title containing "karibi"), `Skipper` (everything else).
+- **Colour-coded categories** from the event title: `1. szint` ... `5. szint` (green, amber, orange, crimson, burgundy), `SRC`, `Karibi` (any title containing "karibi"), `Tanfolyam` (everything else).
 - **Filters** per category. Multi-select, all selected by default (the first click selects only that category). Each view has its own filter. Categories without a loaded event show no chip.
 - **Right link for every event.** The first link in the event description, otherwise the matching club page. Club links leave the iframe when embedded.
-- **Month paging on demand.** Paging in month view loads one month at a time ("Betöltés…"). Loaded months also appear in the list view, so going back in time in month view reveals older events in the list.
+- **Only current events in the list.** The list starts from today: an event is active until the end of its last day (Budapest time) and then drops out. Past events appear only in the month view.
+- **Month paging on demand.** Paging in month view loads one month at a time ("Betöltés…"), also into the past. Loaded future months also appear in the list view; past ones never do.
 - **Event popover** in month view (Esc, outside click or × closes it). A day with several events opens a day popover. Past events say "Lezárult" and offer no add-to-calendar.
 - **Empty month.** Cells turn grey with a short neutral note; not an error.
 - **Add to calendar.** Each upcoming event has two small links: a `.ics` download (any calendar app) and Google Calendar's add-event page. A single event is a one-time copy.
@@ -138,7 +139,7 @@ The category comes from the event title:
 | `4. szint` | 4. szint | crimson |
 | `5. szint` | 5. szint | deep burgundy |
 | `SRC` | SRC | purple |
-| anything else (Horvát C, katamarán and manőver tréning, ...) | Skipper | blue |
+| anything else (Horvát C, katamarán and manőver tréning, ...) | Tanfolyam | blue |
 
 To link an event to a specific page, put the link in the event description. Colours are in `TYPES` at the top of the component; the reasoning is in `SPEC.md` D13.
 
@@ -156,7 +157,7 @@ Test mode shows fixed, fake-but-realistic events instead of the live Google Cale
 
 **How to switch it off:** remove `?test` again. Nothing is stored in the browser, so a reload without it is the real calendar. The real club page must never keep `?test`.
 
-**What it does.** The component loads the events from `test-events.json` next to the script (the script itself contains no test data) and never calls Google, so it also works from a domain that is not an allowed referrer. The data are a snapshot of real club events plus edge cases: every level, SRC, Karibi, Skipper, past, all-day, multi-day, two events on one day, year boundary, an event ending at midnight, good/unsafe/long links in descriptions, and deliberately empty months (Feb 2027, Feb 2028, Aug 2028). The dates run from autumn 2026 to the end of 2028 and must be refreshed when they get old (see `AGENTS.md`).
+**What it does.** The component loads the events from `test-events.json` next to the script (the script itself contains no test data) and never calls Google, so it also works from a domain that is not an allowed referrer. The data are a snapshot of real club events plus edge cases: every level, SRC, Karibi, Tanfolyam, past, all-day, multi-day, two events on one day, year boundary, an event ending at midnight, good/unsafe/long links in descriptions, and deliberately empty months (Feb 2027, Feb 2028, Aug 2028). The dates run from autumn 2026 to the end of 2028 and must be refreshed when they get old (see `AGENTS.md`).
 
 **What it does not do.** Only the URL of the script (or of the iframe/standalone page) switches it. The host page's own URL has no effect, so a visitor cannot turn a club page into test data by adding `?test` to the page link. Add-to-calendar and subscribe links in test mode still point at the real calendar feed.
 
