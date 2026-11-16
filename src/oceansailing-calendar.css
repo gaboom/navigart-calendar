@@ -21,6 +21,11 @@ oceansailing-calendar{display:flow-root}
   .osse-cal__filters{min-width:0}
   .osse-cal__right{flex:none}
 }
+/* Narrow: chips and the subscribe/view group wrap as one flow, so the group sits on the last chip row when it fits instead of getting a row of its own. */
+@container (max-width:679px){
+  .osse-cal__tools{gap:.3rem;justify-content:flex-start}
+  .osse-cal__filters{display:contents}
+}
 .osse-cal__views{display:flex;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden}
 .osse-cal__right{position:relative;display:flex;align-items:flex-start;gap:.5rem;margin-left:auto}
 .osse-cal__sub{position:static}
